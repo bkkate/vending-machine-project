@@ -26,7 +26,10 @@ public class VendingMachineCLI {
 	private VendingMenu menu;
 
 	// items with quantity
-	private Map<String, Integer> itemAndQuantity = new HashMap<>();
+	//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
+	private Map<String, String[] > itemInfo = new HashMap<>();
+	private Map<String, Integer > itemAndQuantity = new HashMap<>();
+
 	private double totalBalance = 0.00;
 
 	//The constructor takes a VendingMenu object as an argument and initializes the private member variable menu.
@@ -37,7 +40,7 @@ public class VendingMachineCLI {
 	// The getChoiceFromOptions method is called on the menu object to get the user's choice.
 		//If the user chooses "Display Vending Machine Items", the corresponding action will be performed (currently nothing).
 		//If the user chooses "Purchase", the corresponding action will be performed (currently nothing).
-	public void run() {
+	public void run() throws FileNotFoundException {
 		boolean running = true;
 		boolean firstRun = true;
 
@@ -60,17 +63,21 @@ public class VendingMachineCLI {
 					// if this is the first run, make a hash map and add each item with full quantity of 5
 					if (firstRun) {
 						for (String[] item : arraysOfItems) {
-							itemAndQuantity.put(item[1], 5);
+							//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
+							itemInfo.put(item[0], new String[]{item[1], item[2], item[3]});
+							itemAndQuantity.put(item[0], 5);
 						}
 					}
 
 					for (String[] item : arraysOfItems) {
 						//print out the name and quantity
-						String itemName = item[1];
+						String itemName = item[0];
 						if (itemAndQuantity.get(itemName) == 0) {
-							System.out.println(itemName + "| " + "SOLD OUT");
+
+							System.out.println(item[1] + "| " + "SOLD OUT");
 						}
-						System.out.println(itemName + "| " + itemAndQuantity.get(itemName));
+						System.out.println(item[1] + "| " + itemAndQuantity.get(itemName));
+						System.out.println(item[1] + "| " + itemInfo);
 					}
 				}
 
@@ -93,7 +100,31 @@ public class VendingMachineCLI {
 						System.out.println("Current Money Provided: " + totalBalance);
 					}
 					else if(purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
+						File listOfItems = new File("vendingmachine.csv");
 
+						try (Scanner dataInput = new Scanner(listOfItems)){
+
+							String currentLine = "";
+							while(dataInput.hasNextLine()) {
+								currentLine = dataInput.nextLine();
+								System.out.println(currentLine);
+
+							}
+							System.out.println("Please choose item!");
+							String itemPurchaseChoice = menu.getIn().nextLine();
+							//itemPurchaseChoice == "A1"
+							if(itemInfo.containsKey(itemPurchaseChoice) ){
+								if(itemAndQuantity.get(itemPurchaseChoice) == 0){
+									System.out.println("Item is out of stock, please choose another item!");
+									continue;
+								}
+							}else {
+								System.out.println(itemInfo);
+								System.out.println(itemAndQuantity);
+								System.out.println("Item doesn't exist, please try again.");
+								continue;
+							}
+						}
 					}
 				}
 
@@ -107,14 +138,14 @@ public class VendingMachineCLI {
 
 	// each time you call this setter, it'll count down quantity of the item by 1
 	public void setItemAndQuantity (String item) {
-		if (itemAndQuantity.get(item) != 0) {
+		if (itemAndQuantity.get(item)!= 0) {
 			this.itemAndQuantity.put(item, itemAndQuantity.get(item)-1) ;
 		}
 	}
 
 	//The main method creates a VendingMenu object and a VendingMachineCLI object, and calls the run method on the VendingMachineCLI object.
 	//This code is just a skeleton for a CLI for a vending machine, we must implement it ourselves.
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		VendingMenu menu = new VendingMenu(System.in, System.out);
 		VendingMachineCLI cli = new VendingMachineCLI(menu);
 		cli.run();
