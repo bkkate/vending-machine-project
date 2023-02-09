@@ -111,8 +111,21 @@ public class VendingMachineCLI {
 					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
 						purchaseMenuSelectProduct();
 					}
-				}	purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
+					purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
+				}
 
+//				if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
+
+					double quartersRemainder = totalBalance % 0.25; // 0.15
+					double nickelsRemainder = totalBalance % 0.10;  // 0.05
+
+					int quartersReturned = (int) (totalBalance / 0.25);
+					int nickelsReturned = (int) (quartersRemainder / 0.10);
+					int dimesReturned = (int) (nickelsRemainder / 0.05);
+
+					System.out.println("Here's your change: " + quartersReturned + " quarters, " + nickelsReturned + " nickels, " +
+							dimesReturned + " dimes");
+					totalBalance = 0.00;
 
 			}
 		}
@@ -156,7 +169,7 @@ public class VendingMachineCLI {
 				currentLine = dataInput.nextLine();
 				System.out.println(currentLine);
 			}
-			System.out.print("Please choose item!: ");
+			System.out.println("Please choose item!: ");
 			String itemPurchaseChoice = menu.getIn().nextLine();
 			//itemPurchaseChoice == "A1"
 			if (itemInfo.containsKey(itemPurchaseChoice)) {
@@ -167,10 +180,15 @@ public class VendingMachineCLI {
 					System.out.println("You don't have enough balance");
 
 				} else {
-					System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName());
-					System.out.println(itemInfo.get(itemPurchaseChoice).slogan());
 					totalBalance -= itemInfo.get(itemPurchaseChoice).getPrice();
 					itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
+
+					System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName() + ": price of $" +
+									String.format("%.2f", itemInfo.get(itemPurchaseChoice).getPrice()));
+
+					System.out.println("Your current balance is $" + String.format("%.2f", totalBalance));
+					System.out.println(itemInfo.get(itemPurchaseChoice).slogan());
+
 				}
 
 			} else {
