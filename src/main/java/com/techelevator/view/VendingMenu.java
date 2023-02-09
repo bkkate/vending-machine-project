@@ -17,6 +17,14 @@ public class VendingMenu {	//class provides an interface for a user to interact 
 		this.in = new Scanner(input);
 	}
 
+//	public PrintWriter getOut() {
+//		return out;
+//	}
+
+	public Scanner getIn() {
+		return in;
+	}
+
 	//The getChoiceFromOptions method takes an array of options as an argument and returns a selected option.
 	// The method calls the displayMenuOptions method to display the options to the user.
 	// Then, it calls the getChoiceFromUserInput method to receive the user's choice.
