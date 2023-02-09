@@ -27,7 +27,7 @@ public class VendingMachineCLI {
 	private static final String[] PURCHASE_MENU_OPTIONS = { PURCHASE_MENU_OPTION_FEED_MONEY, PURCHASE_MENU_OPTION_SELECT_PRODUCT, PURCHASE_MENU_OPTION_FINISH_TRANSACTION};
 	//A private member variable of type VendingMenu is defined.
 	private VendingMenu menu;
-
+	private File listOfItems = new File("vendingmachine.csv");
 	// items with quantity
 	//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
 	private Map<String, Purchasable> itemInfo = new HashMap<>();
@@ -49,7 +49,7 @@ public class VendingMachineCLI {
 		while (running) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 
-			File listOfItems = new File("vendingmachine.csv");
+
 			List<String[]> arraysOfItems = new ArrayList<>();
 
 			try (Scanner dataInput = new Scanner(listOfItems)) {
@@ -105,64 +105,14 @@ public class VendingMachineCLI {
 				// do purchase
 				String purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 
-
+				while (purchaseChoice != PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
 					if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
-						System.out.println("Please enter money in whole dollar amounts");
-
-						double feedMoney = menu.getIn().nextDouble();
-						totalBalance += feedMoney;
-
-						System.out.println("Current Money Provided: " + totalBalance);
-						System.out.println("Would like to add more money? y/n");
-						String yesOrNo = menu.getIn().nextLine();
-
-						while(yesOrNo.equalsIgnoreCase("y")) {
-							System.out.println("Please enter money in whole dollar amounts");
-
-							 feedMoney = menu.getIn().nextDouble();
-							totalBalance += feedMoney;
-
-							System.out.println("Current Money Provided: " + totalBalance);
-							System.out.println("Would like to add more money? y/n");
-							 yesOrNo = menu.getIn().nextLine();
-						}
-
-
+						purchaseMenuFeedMoneyOption();
+					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
+						purchaseMenuSelectProduct();
 					}
-					else if(purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
+				}	purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 
-						try (Scanner dataInput = new Scanner(listOfItems)){
-
-							String currentLine = "";
-							while(dataInput.hasNextLine()) {
-								currentLine = dataInput.nextLine();
-								System.out.println(currentLine);
-							}
-							System.out.print("Please choose item!: ");
-							String itemPurchaseChoice = menu.getIn().nextLine();
-							//itemPurchaseChoice == "A1"
-							if(itemInfo.containsKey(itemPurchaseChoice) ){
-								if(itemInfo.get(itemPurchaseChoice).getQuantity() == 0){
-									System.out.println("Item is out of stock, please choose another item!");
-
-								}
-								else if (itemInfo.get(itemPurchaseChoice).getPrice() > totalBalance){
-									System.out.println("You don't have enough balance");
-
-								}
-								else {
-									System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName());
-									System.out.println(itemInfo.get(itemPurchaseChoice).slogan());
-									totalBalance -= itemInfo.get(itemPurchaseChoice).getPrice();
-									itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
-								}
-
-							}else {
-								System.out.println("Item doesn't exist, please try again.");
-
-							}
-						}
-				}
 
 			}
 		}
@@ -175,4 +125,59 @@ public class VendingMachineCLI {
 		VendingMachineCLI cli = new VendingMachineCLI(menu);
 		cli.run();
 	}
+
+	public void purchaseMenuFeedMoneyOption(){
+		System.out.println("Please enter money in whole dollar amounts");
+
+		double feedMoney = menu.getIn().nextDouble();
+		totalBalance += feedMoney;
+
+		System.out.println("Current Money Provided: " + totalBalance);
+		System.out.println("Would like to add more money? y/n");
+		menu.getIn().nextLine();
+		String yesOrNo = menu.getIn().nextLine();
+
+		while (yesOrNo.equalsIgnoreCase("y")) {
+			System.out.println("Please enter money in whole dollar amounts");
+
+			feedMoney = menu.getIn().nextDouble();
+			totalBalance += feedMoney;
+			menu.getIn().nextLine();
+			System.out.println("Current Money Provided: " + totalBalance);
+			System.out.println("Would like to add more money? y/n");
+			yesOrNo = menu.getIn().nextLine();
+		}
+	}
+	public void purchaseMenuSelectProduct() throws FileNotFoundException {
+		try (Scanner dataInput = new Scanner(listOfItems)) {
+
+			String currentLine = "";
+			while (dataInput.hasNextLine()) {
+				currentLine = dataInput.nextLine();
+				System.out.println(currentLine);
+			}
+			System.out.print("Please choose item!: ");
+			String itemPurchaseChoice = menu.getIn().nextLine();
+			//itemPurchaseChoice == "A1"
+			if (itemInfo.containsKey(itemPurchaseChoice)) {
+				if (itemInfo.get(itemPurchaseChoice).getQuantity() == 0) {
+					System.out.println("Item is out of stock, please choose another item!");
+
+				} else if (itemInfo.get(itemPurchaseChoice).getPrice() > totalBalance) {
+					System.out.println("You don't have enough balance");
+
+				} else {
+					System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName());
+					System.out.println(itemInfo.get(itemPurchaseChoice).slogan());
+					totalBalance -= itemInfo.get(itemPurchaseChoice).getPrice();
+					itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
+				}
+
+			} else {
+				System.out.println("Item doesn't exist, please try again.");
+
+			}
+		}
+	}
+
 }
