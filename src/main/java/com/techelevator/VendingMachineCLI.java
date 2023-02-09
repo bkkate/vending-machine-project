@@ -76,8 +76,6 @@ public class VendingMachineCLI {
 
 							System.out.println(item[1] + "| " + "SOLD OUT");
 						}
-						System.out.println(item[1] + "| " + itemAndQuantity.get(itemName));
-						System.out.println(item[1] + "| " + itemInfo);
 					}
 				}
 
@@ -89,7 +87,6 @@ public class VendingMachineCLI {
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				// do purchase
 				String purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
-
 				while(!purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION)) {
 					if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
 						System.out.println("Please enter money in whole dollar amounts");
@@ -108,9 +105,8 @@ public class VendingMachineCLI {
 							while(dataInput.hasNextLine()) {
 								currentLine = dataInput.nextLine();
 								System.out.println(currentLine);
-
 							}
-							System.out.println("Please choose item!");
+							System.out.print("Please choose item!: ");
 							String itemPurchaseChoice = menu.getIn().nextLine();
 							//itemPurchaseChoice == "A1"
 							if(itemInfo.containsKey(itemPurchaseChoice) ){
