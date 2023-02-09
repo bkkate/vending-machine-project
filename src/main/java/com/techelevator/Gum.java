@@ -7,8 +7,8 @@ public class Gum extends Purchasable{
     }
 
     @Override
-    public void slogan(){
-        System.out.println("Chew Chew, Pop!");
+    public String slogan(){
+        return "Chew Chew, Pop!";
     }
 
 }

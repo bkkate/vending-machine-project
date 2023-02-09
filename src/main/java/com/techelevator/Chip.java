@@ -8,8 +8,8 @@ public class Chip extends Purchasable{
     }
 
     @Override
-    public void slogan(){
-        System.out.println("Crunch Crunch, It's Yummy!");
+    public String slogan(){
+        return "Crunch Crunch, It's Yummy!";
     }
 
 }

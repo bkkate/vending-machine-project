@@ -40,8 +40,8 @@ public class Purchasable {
         return quantity;
     }
 
-    public void setQuantity(String itemName) {
-        if ( quantity!= 0) {
+    public void setQuantity(String slotLocation) {
+        if ( quantity > 0) {
             this.quantity -= 1;
         }
     }
@@ -51,8 +51,8 @@ public class Purchasable {
         purchaseableItems.add(itemToAdd);
     }
 
-    public void slogan(){
-        System.out.println("YUM YUM");
+    public String slogan(){
+        return "YUM YUM";
     }
 
 //    @Override

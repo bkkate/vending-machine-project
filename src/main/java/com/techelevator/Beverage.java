@@ -8,8 +8,8 @@ public class Beverage extends Purchasable{
     }
 
     @Override
-    public void slogan(){
-        System.out.println("Glug Glug, Chug Chug!");
+    public String slogan(){
+        return "Glug Glug, Chug Chug!";
     }
 
 

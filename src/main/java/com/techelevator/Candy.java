@@ -8,8 +8,8 @@ public class Candy extends Purchasable {
     }
 
     @Override
-    public void slogan(){
-        System.out.println("Munch Munch, Mmm Mmm Good!");
+    public String slogan(){
+       return "Munch Munch, Mmm Mmm Good!";
     }
 
 

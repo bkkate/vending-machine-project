@@ -49,59 +49,63 @@ public class VendingMachineCLI {
 		while (running) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 
+			File listOfItems = new File("vendingmachine.csv");
+			List<String[]> arraysOfItems = new ArrayList<>();
+
+			try (Scanner dataInput = new Scanner(listOfItems)) {
+
+				while (dataInput.hasNextLine()) {
+					String currentLine = dataInput.nextLine();
+					String[] eachItem = currentLine.split("\\|");
+					arraysOfItems.add(eachItem);
+				}
+
+				// if this is the first run, make a hash map and add each item with full quantity of 5
+				if (firstRun) {
+					for (String[] item : arraysOfItems) {
+						//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
+						//itemInfo.put(item[0], new String[]{item[1], item[2], item[3]});
+						if (item[3].equals("Chip")) {
+							itemInfo.put(item[0], new Chip(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+						}
+						if (item[3].equals("Candy")) {
+							itemInfo.put(item[0], new Candy(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+						}
+						if (item[3].equals("Drink")) {
+							itemInfo.put(item[0], new Beverage(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+						}
+						if (item[3].equals("Gum")) {
+							itemInfo.put(item[0], new Gum(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+						}
+					}
+					firstRun = false;
+				}
+			}
+			catch (FileNotFoundException e){
+				//
+			}
+
 			// A switch statement could also be used here.  Your choice.
 			if (choice.equals(MAIN_MENU_OPTION_DISPLAY_ITEMS)) {
 				// display vending machine items
-				File listOfItems = new File("vendingmachine.csv");
 
-				try (Scanner dataInput = new Scanner(listOfItems)){
-					List<String[]> arraysOfItems = new ArrayList<>();
-					while(dataInput.hasNextLine()) {
-						String currentLine = dataInput.nextLine();
-						String[] eachItem = currentLine.split("\\|");
-						System.out.println(currentLine);
-						arraysOfItems.add(eachItem);
-					}
-
-					// if this is the first run, make a hash map and add each item with full quantity of 5
-					if (firstRun) {
-						for (String[] item : arraysOfItems) {
-							//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
-							//itemInfo.put(item[0], new String[]{item[1], item[2], item[3]});
-							if(item[3].equals("Chip")){
-								itemInfo.put(item[0], new Chip(item[0], item[1], Double.parseDouble(item[2]), item[3]));
-							}
-							if(item[3].equals("Candy")){
-								itemInfo.put(item[0], new Candy(item[0], item[1], Double.parseDouble(item[2]), item[3]));
-							}
-							if(item[3].equals("Drink")){
-								itemInfo.put(item[0], new Beverage(item[0], item[1], Double.parseDouble(item[2]), item[3]));
-							}
-							if(item[3].equals("Gum")){
-								itemInfo.put(item[0], new Gum(item[0], item[1], Double.parseDouble(item[2]), item[3]));
-							}
-						}
-					}
-
-					for (String[] item : arraysOfItems) {
+				for (String[] item : arraysOfItems) {
 						//print out the name and quantity
 						String itemName = item[0];
-						if (itemInfo.get(itemName).getQuantity() == 0) {
 
+						if (itemInfo.get(itemName).getQuantity() == 0) {
 							System.out.println(item[1] + "| " + "SOLD OUT");
 						}
+						else {
+							System.out.println(item[1] + "| " + itemInfo.get(itemName).getQuantity());
+						}
 					}
-				}
-
-				catch (FileNotFoundException e){
-					//
-				}
-
 
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				// do purchase
 				String purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
-				while(!purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION)) {
+
+
 					if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
 						System.out.println("Please enter money in whole dollar amounts");
 
@@ -109,9 +113,23 @@ public class VendingMachineCLI {
 						totalBalance += feedMoney;
 
 						System.out.println("Current Money Provided: " + totalBalance);
+						System.out.println("Would like to add more money? y/n");
+						String yesOrNo = menu.getIn().nextLine();
+
+						while(yesOrNo.equalsIgnoreCase("y")) {
+							System.out.println("Please enter money in whole dollar amounts");
+
+							 feedMoney = menu.getIn().nextDouble();
+							totalBalance += feedMoney;
+
+							System.out.println("Current Money Provided: " + totalBalance);
+							System.out.println("Would like to add more money? y/n");
+							 yesOrNo = menu.getIn().nextLine();
+						}
+
+
 					}
 					else if(purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
-						File listOfItems = new File("vendingmachine.csv");
 
 						try (Scanner dataInput = new Scanner(listOfItems)){
 
@@ -126,14 +144,24 @@ public class VendingMachineCLI {
 							if(itemInfo.containsKey(itemPurchaseChoice) ){
 								if(itemInfo.get(itemPurchaseChoice).getQuantity() == 0){
 									System.out.println("Item is out of stock, please choose another item!");
-									continue;
+
 								}
+								else if (itemInfo.get(itemPurchaseChoice).getPrice() > totalBalance){
+									System.out.println("You don't have enough balance");
+
+								}
+								else {
+									System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName());
+									System.out.println(itemInfo.get(itemPurchaseChoice).slogan());
+									totalBalance -= itemInfo.get(itemPurchaseChoice).getPrice();
+									itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
+								}
+
 							}else {
 								System.out.println("Item doesn't exist, please try again.");
-								continue;
+
 							}
 						}
-					}
 				}
 
 			}
