@@ -28,7 +28,7 @@ public class VendingMachineCLI {
 	//A private member variable of type VendingMenu is defined.
 	private VendingMenu menu;
 	private File listOfItems = new File("vendingmachine.csv");
-	// items with quantity
+
 	//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
 	private Map<String, Purchasable> itemInfo = new HashMap<>();
 
@@ -135,7 +135,18 @@ public class VendingMachineCLI {
 			} else if (choice.equals(MAIN_MENU_SECRET_OPTION)) {
 				File salesReportFile = new File("SalesReport" + getTimeForSalesReport() + ".txt");
 				try(PrintWriter SalesOutput = new PrintWriter(salesReportFile)){
-					
+
+					//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
+					//	private Map<String, Purchasable> itemInfo = new HashMap<>();
+
+					double totalSalesAmount = 0.00;
+					for (Map.Entry<String, Purchasable> entry : itemInfo.entrySet()) {
+						int quantitySold = 5 - entry.getValue().getQuantity();
+						SalesOutput.println(entry.getValue().getProductName() + "|" + quantitySold);
+						totalSalesAmount += ((entry.getValue().getPrice()) * quantitySold);
+					}
+					SalesOutput.println("\n**TOTAL SALES** $" + String.format("%.2f", totalSalesAmount));
+					System.out.println("You can find the Sales Report here: " + salesReportFile.getName());
 				}
 			} else{
 				running = false;
@@ -199,7 +210,7 @@ public class VendingMachineCLI {
 					itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
 
 					dataOutput.println( getTime() + " " + itemInfo.get(itemPurchaseChoice).getProductName() + " " + itemPurchaseChoice + " $"
-							+ itemInfo.get(itemPurchaseChoice).getPrice() + " $" + totalBalance);
+							+ String.format("%.2f", itemInfo.get(itemPurchaseChoice).getPrice()) + " $" + String.format("%.2f", totalBalance));
 
 					System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName() + ": price of $" +
 									String.format("%.2f", itemInfo.get(itemPurchaseChoice).getPrice()));
@@ -222,7 +233,7 @@ public class VendingMachineCLI {
 		return dateTimeStr;
 	}
 	public String getTimeForSalesReport(){
-		SimpleDateFormat dateTime = new SimpleDateFormat("MM/dd/yyyy-hh:mm:ss");
+		SimpleDateFormat dateTime = new SimpleDateFormat("MM_dd_yyyy_hh_mm_ss");
 		String dateTimeStr = dateTime.format(new Date());
 		return dateTimeStr;
 	}
