@@ -2,9 +2,12 @@ package com.techelevator;
 
 import com.techelevator.view.VendingMenu;
 
+import javax.management.ObjectName;
+import javax.management.PersistentMBean;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -27,8 +30,7 @@ public class VendingMachineCLI {
 
 	// items with quantity
 	//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
-	private Map<String, String[] > itemInfo = new HashMap<>();
-	private Map<String, Integer > itemAndQuantity = new HashMap<>();
+	private Map<String, Purchasable> itemInfo = new HashMap<>();
 
 	private double totalBalance = 0.00;
 
@@ -57,6 +59,7 @@ public class VendingMachineCLI {
 					while(dataInput.hasNextLine()) {
 						String currentLine = dataInput.nextLine();
 						String[] eachItem = currentLine.split("\\|");
+						System.out.println(currentLine);
 						arraysOfItems.add(eachItem);
 					}
 
@@ -64,15 +67,26 @@ public class VendingMachineCLI {
 					if (firstRun) {
 						for (String[] item : arraysOfItems) {
 							//saves A1|Potato Crisps|3.05|Chip in a hashmap that has ( Potato Crisps as key, value = A1|3.05|Chip
-							itemInfo.put(item[0], new String[]{item[1], item[2], item[3]});
-							itemAndQuantity.put(item[0], 5);
+							//itemInfo.put(item[0], new String[]{item[1], item[2], item[3]});
+							if(item[3].equals("Chip")){
+								itemInfo.put(item[0], new Chip(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+							}
+							if(item[3].equals("Candy")){
+								itemInfo.put(item[0], new Candy(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+							}
+							if(item[3].equals("Drink")){
+								itemInfo.put(item[0], new Beverage(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+							}
+							if(item[3].equals("Gum")){
+								itemInfo.put(item[0], new Gum(item[0], item[1], Double.parseDouble(item[2]), item[3]));
+							}
 						}
 					}
 
 					for (String[] item : arraysOfItems) {
 						//print out the name and quantity
 						String itemName = item[0];
-						if (itemAndQuantity.get(itemName) == 0) {
+						if (itemInfo.get(itemName).getQuantity() == 0) {
 
 							System.out.println(item[1] + "| " + "SOLD OUT");
 						}
@@ -110,13 +124,11 @@ public class VendingMachineCLI {
 							String itemPurchaseChoice = menu.getIn().nextLine();
 							//itemPurchaseChoice == "A1"
 							if(itemInfo.containsKey(itemPurchaseChoice) ){
-								if(itemAndQuantity.get(itemPurchaseChoice) == 0){
+								if(itemInfo.get(itemPurchaseChoice).getQuantity() == 0){
 									System.out.println("Item is out of stock, please choose another item!");
 									continue;
 								}
 							}else {
-								System.out.println(itemInfo);
-								System.out.println(itemAndQuantity);
 								System.out.println("Item doesn't exist, please try again.");
 								continue;
 							}
@@ -125,17 +137,6 @@ public class VendingMachineCLI {
 				}
 
 			}
-		}
-	}
-
-	public Map<String, Integer> getItemAndQuantity() {
-		return this.itemAndQuantity;
-	}
-
-	// each time you call this setter, it'll count down quantity of the item by 1
-	public void setItemAndQuantity (String item) {
-		if (itemAndQuantity.get(item)!= 0) {
-			this.itemAndQuantity.put(item, itemAndQuantity.get(item)-1) ;
 		}
 	}
 
