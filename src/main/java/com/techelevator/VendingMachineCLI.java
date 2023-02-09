@@ -4,10 +4,10 @@ import com.techelevator.view.VendingMenu;
 
 import javax.management.ObjectName;
 import javax.management.PersistentMBean;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import javax.print.DocFlavor;
+import java.io.*;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -82,7 +82,7 @@ public class VendingMachineCLI {
 				}
 			}
 			catch (FileNotFoundException e){
-				//
+				System.out.println("The file was not found! Please find it!");
 			}
 
 			// A switch statement could also be used here.  Your choice.
@@ -104,18 +104,19 @@ public class VendingMachineCLI {
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				// do purchase
 				String purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
-
-				while (purchaseChoice != PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
-					if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
-						purchaseMenuFeedMoneyOption();
-					} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
-						purchaseMenuSelectProduct();
+				File outputFile = new File("Log.txt");
+				try(FileWriter fileWriter = new FileWriter(outputFile, true); PrintWriter dataOutput = new PrintWriter(fileWriter)){
+					while (purchaseChoice != PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
+						if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
+							purchaseMenuFeedMoneyOption(dataOutput);
+						} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
+							purchaseMenuSelectProduct(dataOutput);
+						}
+						purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 					}
-					purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
-				}
 
-//				if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
-
+//						if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION) {
+					dataOutput.println(getTime() + " " + "GIVE CHANGE: $" + String.format("%.2f", totalBalance) + " $" + 0.00);
 					double quartersRemainder = totalBalance % 0.25; // 0.15
 					double nickelsRemainder = totalBalance % 0.10;  // 0.05
 
@@ -127,7 +128,19 @@ public class VendingMachineCLI {
 							dimesReturned + " dimes");
 					totalBalance = 0.00;
 
+
+				}catch (IOException e){
+					System.out.println("File not found");
+				}
+			} else if (choice.equals(MAIN_MENU_SECRET_OPTION)) {
+				File salesReportFile = new File("SalesReport" + getTimeForSalesReport() + ".txt");
+				try(PrintWriter SalesOutput = new PrintWriter(salesReportFile)){
+					
+				}
+			} else{
+				running = false;
 			}
+
 		}
 	}
 
@@ -139,13 +152,15 @@ public class VendingMachineCLI {
 		cli.run();
 	}
 
-	public void purchaseMenuFeedMoneyOption(){
+	public void purchaseMenuFeedMoneyOption(PrintWriter dataOutput){
 		System.out.println("Please enter money in whole dollar amounts");
 
 		double feedMoney = menu.getIn().nextDouble();
 		totalBalance += feedMoney;
 
-		System.out.println("Current Money Provided: " + totalBalance);
+		dataOutput.println(getTime() + " " + "FEED MONEY: $" + String.format("%.2f", feedMoney) + " $" + String.format("%.2f", totalBalance));
+
+		System.out.println("Current Money Provided: " + String.format("%.2f", totalBalance));
 		System.out.println("Would like to add more money? y/n");
 		menu.getIn().nextLine();
 		String yesOrNo = menu.getIn().nextLine();
@@ -156,12 +171,12 @@ public class VendingMachineCLI {
 			feedMoney = menu.getIn().nextDouble();
 			totalBalance += feedMoney;
 			menu.getIn().nextLine();
-			System.out.println("Current Money Provided: " + totalBalance);
+			System.out.println("Current Money Provided: " + String.format("%.2f", totalBalance));
 			System.out.println("Would like to add more money? y/n");
 			yesOrNo = menu.getIn().nextLine();
 		}
 	}
-	public void purchaseMenuSelectProduct() throws FileNotFoundException {
+	public void purchaseMenuSelectProduct(PrintWriter dataOutput) throws FileNotFoundException {
 		try (Scanner dataInput = new Scanner(listOfItems)) {
 
 			String currentLine = "";
@@ -183,6 +198,9 @@ public class VendingMachineCLI {
 					totalBalance -= itemInfo.get(itemPurchaseChoice).getPrice();
 					itemInfo.get(itemPurchaseChoice).setQuantity(itemPurchaseChoice);
 
+					dataOutput.println( getTime() + " " + itemInfo.get(itemPurchaseChoice).getProductName() + " " + itemPurchaseChoice + " $"
+							+ itemInfo.get(itemPurchaseChoice).getPrice() + " $" + totalBalance);
+
 					System.out.println("Dispensing " + itemInfo.get(itemPurchaseChoice).getProductName() + ": price of $" +
 									String.format("%.2f", itemInfo.get(itemPurchaseChoice).getPrice()));
 
@@ -196,6 +214,17 @@ public class VendingMachineCLI {
 
 			}
 		}
+	}
+
+	public String getTime(){
+		SimpleDateFormat dateTime = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+		String dateTimeStr = dateTime.format(new Date());
+		return dateTimeStr;
+	}
+	public String getTimeForSalesReport(){
+		SimpleDateFormat dateTime = new SimpleDateFormat("MM/dd/yyyy-hh:mm:ss");
+		String dateTimeStr = dateTime.format(new Date());
+		return dateTimeStr;
 	}
 
 }
