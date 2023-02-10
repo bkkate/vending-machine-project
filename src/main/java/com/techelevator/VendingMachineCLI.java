@@ -49,7 +49,6 @@ public class VendingMachineCLI {
 		while (running) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 
-
 			List<String[]> arraysOfItems = new ArrayList<>();
 
 			try (Scanner dataInput = new Scanner(listOfItems)) {
@@ -94,10 +93,12 @@ public class VendingMachineCLI {
 						String itemName = item[0];
 
 						if (itemInfo.get(itemName).getQuantity() == 0) {
-							System.out.println(item[1] + "| " + "SOLD OUT");
+//							System.out.println(item[1] + "| " + "SOLD OUT");
+							System.out.printf("%-2s) %-20s %-6s %-5s\n", item[0], item[1], item[2],"SOLD OUT");
 						}
 						else {
-							System.out.println(item[1] + "| " + itemInfo.get(itemName).getQuantity());
+//							System.out.println(item[1] + "| " + itemInfo.get(itemName).getQuantity());
+							System.out.printf("%-2s) %-20s %-6s %-5d\n", item[0], item[1], item[2], itemInfo.get(itemName).getQuantity());
 						}
 					}
 
