@@ -155,4 +155,16 @@ public class VendingOperations {
 		return dateTimeStr;
 	}
 
+	public double getTotalBalance() {
+		return totalBalance;
+	}
+
+	public void setTotalBalance(double balance) {
+		 this.totalBalance = balance;
+	}
+
+	public Map<String, Purchasable> getItemInfo() {
+		return itemInfo;
+	}
+
 }
